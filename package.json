@@ -1,0 +1,7 @@
+{
+  "name": "frame-queue",
+  "version": "0.0.0",
+  "dependencies": {
+    "component-raf": "~1.1.3"
+  }
+}
