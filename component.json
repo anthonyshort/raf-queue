@@ -1,6 +1,9 @@
 {
   "name": "frame-queue",
-  "scripts": ["index.js"],
+  "version": "0.0.1",
+  "scripts": [
+    "index.js"
+  ],
   "dependencies": {
     "component/raf": "^1.1.3"
   }
