@@ -11,7 +11,7 @@ var id = 0;
  * @param {Object} cxt
  */
 
-exports.add = function (fn, cxt) {
+function frame (fn, cxt) {
   var frameId = id++;
   var length = queue.push({
     id: frameId,
@@ -29,7 +29,7 @@ exports.add = function (fn, cxt) {
  * @param {Number} id
  */
 
-exports.remove = function (id) {
+frame.cancel = function (id) {
   for (var i = queue.length - 1; i >= 0; i--) {
     if(queue[i].id === id) {
       queue.splice(i, 1);
@@ -45,18 +45,18 @@ exports.remove = function (id) {
  * @param {Object} cxt
  */
 
-exports.once = function (fn, cxt) {
+frame.once = function (fn, cxt) {
   for (var i = queue.length - 1; i >= 0; i--) {
     if(queue[i].fn === fn) return;
   }
-  exports.add(fn, cxt);
+  frame(fn, cxt);
 };
 
 /**
  * Get the current queue length
  */
 
-exports.length = function () {
+frame.queued = function () {
   return queue.length;
 };
 
@@ -64,7 +64,7 @@ exports.length = function () {
  * Clear the queue and remove all pending jobs
  */
 
-exports.clear = function () {
+frame.clear = function () {
   queue = [];
   if(requestId) raf.cancel(requestId);
   requestId = null;
@@ -76,7 +76,7 @@ exports.clear = function () {
  * in testing.
  */
 
-exports.defer = function (fn) {
+frame.defer = function (fn) {
   raf(raf.bind(null, fn));
 };
 
@@ -91,3 +91,5 @@ function flush () {
   }
   requestId = null;
 }
+
+module.exports = frame;

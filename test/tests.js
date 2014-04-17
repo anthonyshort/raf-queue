@@ -14,29 +14,29 @@ describe('raf-queue', function () {
   });
 
   it('should push items onto the queue', function () {
-    frame.add(increment);
+    frame(increment);
   });
 
   it('should not update on this frame', function () {
-    frame.add(increment);
+    frame(increment);
     assert(i === 0);
   });
 
   it('should return a job id', function () {
-    var id = frame.add(increment);
+    var id = frame(increment);
     assert(typeof id === 'number');
   });
 
   it('should run them in order', function (done) {
-    frame.add(increment);
-    frame.add(function(){
+    frame(increment);
+    frame(function(){
       assert(i === 1);
       done();
     });
   });
 
   it('should clear any queued jobs', function (done) {
-    frame.add(increment);
+    frame(increment);
     frame.clear();
     frame.defer(function(){
       assert(i === 0);
@@ -45,7 +45,7 @@ describe('raf-queue', function () {
   });
 
   it('should defer a function', function (done) {
-    frame.add(increment);
+    frame(increment);
     frame.defer(function(){
       assert(i === 1);
       done();
@@ -63,10 +63,10 @@ describe('raf-queue', function () {
   });
 
   it('should remove a job', function (done) {
-    var one = frame.add(increment);
-    var two = frame.add(increment);
-    var three = frame.add(increment);
-    frame.remove(one);
+    var one = frame(increment);
+    var two = frame(increment);
+    var three = frame(increment);
+    frame.cancel(one);
     frame.defer(function(){
       assert(i === 2);
       done();
@@ -77,7 +77,7 @@ describe('raf-queue', function () {
     frame.once(increment);
     frame.once(increment);
     frame.once(increment);
-    assert(frame.length() === 1);
+    assert(frame.queued() === 1);
     frame.defer(function(){
       assert(i === 1);
       done();
