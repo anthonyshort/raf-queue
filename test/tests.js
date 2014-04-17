@@ -1,7 +1,7 @@
-var frame = require('../');
+var frame = require('raf-queue');
 var assert = require('assert');
 
-describe('frame-queue', function () {
+describe('raf-queue', function () {
   var i;
 
   function increment() {
@@ -24,7 +24,7 @@ describe('frame-queue', function () {
 
   it('should return a job id', function () {
     var id = frame.add(increment);
-    assert(id === 0);
+    assert(typeof id === 'number');
   });
 
   it('should run them in order', function (done) {
@@ -69,6 +69,17 @@ describe('frame-queue', function () {
     frame.remove(one);
     frame.defer(function(){
       assert(i === 2);
+      done();
+    });
+  });
+
+  it('should add a function once', function (done) {
+    frame.once(increment);
+    frame.once(increment);
+    frame.once(increment);
+    assert(frame.length() === 1);
+    frame.defer(function(){
+      assert(i === 1);
       done();
     });
   });

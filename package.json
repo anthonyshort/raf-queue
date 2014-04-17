@@ -1,7 +1,0 @@
-{
-  "name": "raf-queue",
-  "version": "0.0.1",
-  "dependencies": {
-    "component-raf": "~1.1.3"
-  }
-}

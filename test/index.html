@@ -10,9 +10,10 @@
     <div id="mocha"></div>
     <script src="mocha.js"></script>
     <script>mocha.setup('bdd')</script>
-    <script src="build.js"></script>
+    <script src="../build/build.js"></script>
+    <script src="tests.js"></script>
     <script>
-      mocha.run();
+      (window.mochaPhantomJS || mocha).run();
     </script>
   </body>
 </html>

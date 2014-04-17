@@ -1,28 +1,93 @@
-var raf = require('component-raf');
+var raf = require('raf');
 var queue = [];
-var job;
+var requestId;
+var id = 0;
+
+/**
+ * Add a job to the queue passing in
+ * an optional context to call the function in
+ *
+ * @param {Function} fn
+ * @param {Object} cxt
+ */
 
 exports.add = function (fn, cxt) {
-  var length = queue.push(fn.bind(cxt));
-  if(!job) job = raf(flush);
-  return length - 1;
+  var frameId = id++;
+  var length = queue.push({
+    id: frameId,
+    fn: fn,
+    cxt: cxt
+  });
+  if(!requestId) requestId = raf(flush);
+  return frameId;
 };
 
-exports.remove = function (index) {
-  queue.splice(index, 1);
+/**
+ * Remove a job from the queue using the
+ * frameId returned when it was added
+ *
+ * @param {Number} id
+ */
+
+exports.remove = function (id) {
+  for (var i = queue.length - 1; i >= 0; i--) {
+    if(queue[i].id === id) {
+      queue.splice(i, 1);
+      break;
+    }
+  }
 };
 
-exports.clear = function() {
+/**
+ * Add a function to the queue, but only once
+ *
+ * @param {Function} fn
+ * @param {Object} cxt
+ */
+
+exports.once = function (fn, cxt) {
+  for (var i = queue.length - 1; i >= 0; i--) {
+    if(queue[i].fn === fn) return;
+  }
+  exports.add(fn, cxt);
+};
+
+/**
+ * Get the current queue length
+ */
+
+exports.length = function () {
+  return queue.length;
+};
+
+/**
+ * Clear the queue and remove all pending jobs
+ */
+
+exports.clear = function () {
   queue = [];
-  if(job) raf.cancel(job);
-  job = null;
+  if(requestId) raf.cancel(requestId);
+  requestId = null;
 };
 
-exports.defer = function(fn) {
+/**
+ * Fire a function after all of the jobs in the
+ * current queue have fired. This is usually used
+ * in testing.
+ */
+
+exports.defer = function (fn) {
   raf(raf.bind(null, fn));
 };
 
-function flush() {
-  while(queue.length) queue.shift()();
-  job = null;
+/**
+ * Flushes the queue and runs each job
+ */
+
+function flush () {
+  while(queue.length) {
+    var job = queue.shift();
+    job.fn.call(job.cxt);
+  }
+  requestId = null;
 }
