@@ -1,5 +1,6 @@
 {
   "name": "raf-queue",
+  "license": "MIT",
   "version": "0.2.0",
   "dependencies": {
     "component-raf": "1.1.3"
